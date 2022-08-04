@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.mika</groupId>
-    <artifactId>SimpleNetworkSources</artifactId>
+    <artifactId>simple-network-sources</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -29,5 +29,21 @@
         <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.mika</groupId>
+            <artifactId>simple-network</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>
