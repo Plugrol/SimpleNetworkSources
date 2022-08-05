@@ -54,7 +54,6 @@ public class MikaSocketClient extends SocketClient
 
     }
 
-
     @Override public InetSocketAddress getAddress()
     {
         return new InetSocketAddress(client.getInetAddress(), client.getPort());
@@ -67,7 +66,6 @@ public class MikaSocketClient extends SocketClient
 
     @Override public void run()
     {
-
     }
 
     @Override public void shutdown()
