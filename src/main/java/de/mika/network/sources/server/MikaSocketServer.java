@@ -16,7 +16,6 @@
 
 package de.mika.network.sources.server;
 
-import de.mika.network.api.pipeline.ChannelAction;
 import de.mika.network.api.pipeline.ChannelHandler;
 import de.mika.network.api.server.SocketServer;
 import de.mika.network.api.socket.DataPacket;
@@ -32,6 +31,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -110,19 +110,19 @@ public class MikaSocketServer extends SocketServer
     @Override public void sendPacket(String clientId, DataPacket dataPacket)
     {
         if (!isClient()) return;
-        getClientById(clientId).sendPacket(dataPacket);
+        Objects.requireNonNull(getClientById(clientId)).sendPacket(dataPacket);
     }
 
     @Override public DataPacket sendAnsweredPacket(String clientId, DataPacket dataPacket)
     {
         if (!isClient()) return null;
-        return getClientById(clientId).sendAnsweredPacket(dataPacket);
+        return Objects.requireNonNull(getClientById(clientId)).sendAnsweredPacket(dataPacket);
     }
 
     @Override public void broadcastPacket(String group, DataPacket dataPacket)
     {
         if (!isClient()) return;
-        getClientByGroup(group).sendPacket(dataPacket);
+        Objects.requireNonNull(getClientByGroup(group)).sendPacket(dataPacket);
     }
 
     @Override public void broadcastPacket(DataPacket dataPacket)
@@ -175,11 +175,7 @@ public class MikaSocketServer extends SocketServer
                         readyUpSocket(SERVER_SOCKET.accept());
                     }
                 }
-                catch (IOException e)
-                {
-                    throw new RuntimeException(e);
-                }
-                catch (ClassNotFoundException e)
+                catch (IOException | ClassNotFoundException e)
                 {
                     throw new RuntimeException(e);
                 }
@@ -192,15 +188,13 @@ public class MikaSocketServer extends SocketServer
     private void readyUpSocket(Socket socket) throws IOException, ClassNotFoundException
     {
         if (this.isPacketAuthorization()) return;
-        getChannelHandler().execution(InternalProtocols.LOGIN.toString(), new ChannelAction()
-        {
-            @Override public Serializable[] run(DataPacket input, Socket tempSocket)
-            {
-                ServerSocketClient server = new ServerSocketClient(input.getSign().sender(), input.getSign().group(), tempSocket);
+        getChannelHandler().execution(InternalProtocols.LOGIN.toString(), (input, tempSocket) -> {
+            ServerSocketClient server = new ServerSocketClient(input.getSign().sender(), input.getSign().group(), tempSocket);
+            if (getClientById(input.getSign().sender()) == null) {
                 clients.add(server);
-                handleSocket(socket, server);
-                return new Serializable[0]; //Hallo -- gesehen von mika :O
             }
+            handleSocket(socket, getClientById(input.getSign().sender()));
+            return new Serializable[0];
         });
     }
 
